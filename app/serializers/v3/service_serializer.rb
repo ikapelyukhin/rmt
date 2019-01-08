@@ -6,7 +6,7 @@ class V3::ServiceSerializer < ApplicationSerializer
 
   def url
     # credentials parameter is required by Yast, it dies without it
-    service_url(object, host: base_url, credentials: object.name)
+    "plugin:/susecloud?credentials=#{object.name}&url=" + service_url(object, host: base_url)
   end
 
   def obsoleted_service_name

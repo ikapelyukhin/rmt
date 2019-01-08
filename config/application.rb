@@ -22,6 +22,20 @@ if (Rails.env.production? || ENV['RMT_LOAD_ENGINES'])
   end
 end
 
+# Middleware that dumps requests to static files to STDOUT w/ custom auth headers
+class StaticLog
+  def initialize(app)
+    @app = app
+  end
+
+  def call(env)
+    # pp env.select { |k,v| k =~ /^HTTP_/ }
+    puts "URL: #{env['REQUEST_PATH']}, plugin headers: #{env['HTTP_X_INSTANCE_IID']}"
+    res = @app.call(env)
+    res
+  end
+end
+
 module RMT
   class CustomConfiguration < Rails::Application::Configuration
 
@@ -56,6 +70,8 @@ module RMT
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    config.middleware.insert_before ActionDispatch::Static, StaticLog
 
     config.generators do |g|
       g.test_framework :rspec
