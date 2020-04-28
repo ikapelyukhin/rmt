@@ -141,9 +141,9 @@ RSpec.describe RMT::CLI::Systems do
         let(:expected_output) { "System with login 1 not found.\n" }
 
         it 'raises ActiveRecord::RecordNotFound' do
-          expect { described_class.start(argv) }
-            .to output(expected_output).to_stdout
-            .and output('').to_stderr
+          expect { described_class.start(argv) }.to raise_error(SystemExit).and(
+            output(expected_output).to_stderr.and output('').to_stdout
+          )
         end
       end
 
@@ -154,9 +154,9 @@ RSpec.describe RMT::CLI::Systems do
 
         it 'raises ActiveRecord::RecordNotDestroyed' do
           expect_any_instance_of(System).to receive(:destroy!).and_raise(ActiveRecord::RecordNotDestroyed)
-          expect { described_class.start(argv) }
-            .to output(expected_output).to_stdout
-            .and output('').to_stderr
+          expect { described_class.start(argv) }.to raise_error(SystemExit).and(
+            output(expected_output).to_stderr.and output('').to_stdout
+          )
         end
       end
     end
